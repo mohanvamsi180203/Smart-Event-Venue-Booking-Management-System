@@ -102,6 +102,10 @@
         <!-- ==================== CATEGORIES ==================== -->
         <section class="categories" id="categories">
             <div class="category reveal" id="cat-concerts">
+                <span class="cat-icon">🎪</span>
+                <span class="cat-label">Events</span>
+            </div>
+            <div class="category reveal" id="cat-concerts">
                 <span class="cat-icon">🎤</span>
                 <span class="cat-label">Concerts</span>
             </div>
