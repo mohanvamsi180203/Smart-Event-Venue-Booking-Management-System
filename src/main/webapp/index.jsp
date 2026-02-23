@@ -121,10 +121,6 @@
                 <span class="cat-icon">🎓</span>
                 <span class="cat-label">Workshops</span>
             </div>
-            <div class="category reveal reveal-delay-4" id="cat-outdoor">
-                <span class="cat-icon">🌳</span>
-                <span class="cat-label">Outdoor</span>
-            </div>
             <div class="category reveal reveal-delay-4" id="cat-conferences">
                 <span class="cat-icon">🏢</span>
                 <span class="cat-label">Conferences</span>
