@@ -31,8 +31,8 @@
 
             <div class="nav-right">
                 <a href="#" class="btn-outline" id="nav-tickets">🎫 My Tickets</a>
-                <a href="#" id="nav-login">Login</a>
-                <a href="#" class="btn-primary" id="nav-signup">Sign Up</a>
+                <a href="user-login.jsp" id="nav-login">Login</a>
+                <a href="user-signup.jsp" class="btn-primary" id="nav-signup">Sign Up</a>
             </div>
         </header>
 
