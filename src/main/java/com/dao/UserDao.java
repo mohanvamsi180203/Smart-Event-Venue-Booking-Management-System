@@ -1,309 +1,229 @@
 package com.dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import com.dto.User;
-import com.util.DBUtil;
+import com.util.DBConnection;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Data Access Object for User operations
- * Handles all database operations related to user registration and verification
+ * Data Access Object for User entity
+ * Handles all database operations related to users
  */
 public class UserDao {
-    
+
+    // SQL Queries
+    private static final String INSERT_USER = "INSERT INTO users (name, password, email, otp, is_verified) VALUES (?, ?, ?, ?, ?)";
+    private static final String GET_USER_BY_EMAIL = "SELECT * FROM users WHERE email = ?";
+    private static final String GET_USER_BY_ID = "SELECT * FROM users WHERE id = ?";
+    private static final String GET_USER_BY_EMAIL_AND_PASSWORD = "SELECT * FROM users WHERE email = ? AND password = ?";
+    private static final String UPDATE_OTP = "UPDATE users SET otp = ? WHERE email = ?";
+    private static final String VERIFY_USER = "UPDATE users SET is_verified = TRUE WHERE email = ?";
+    private static final String GET_ALL_USERS = "SELECT * FROM users";
+    private static final String DELETE_USER = "DELETE FROM users WHERE id = ?";
+    private static final String UPDATE_PASSWORD = "UPDATE users SET password = ? WHERE email = ?";
+
     /**
-     * Save a new user to the database with OTP
-     * @param user User object to save
-     * @return true if user was saved successfully, false otherwise
+     * Register a new user
+     * @param user User object to register
+     * @return true if registration successful, false otherwise
      */
-    public boolean saveUser(User user) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        
-        String sql = "INSERT INTO users (name, password, email, otp, is_verified, created_at) VALUES (?, ?, ?, ?, false, CURRENT_TIMESTAMP)";
-        
-        try {
-            conn = DBUtil.getConnection();
-            pstmt = conn.prepareStatement(sql);
+    public boolean registerUser(User user) {
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(INSERT_USER, Statement.RETURN_GENERATED_KEYS)) {
             
             pstmt.setString(1, user.getName());
             pstmt.setString(2, user.getPassword());
             pstmt.setString(3, user.getEmail());
             pstmt.setInt(4, user.getOtp());
+            pstmt.setBoolean(5, user.isVerified());
             
             int result = pstmt.executeUpdate();
-            return result > 0;
             
-        } catch (SQLException e) {
+            if (result > 0) {
+                ResultSet rs = pstmt.getGeneratedKeys();
+                if (rs.next()) {
+                    user.setId(rs.getInt(1));
+                }
+                return true;
+            }
+        } catch (Exception e) {
             e.printStackTrace();
-            return false;
-        } finally {
-            closeResources(conn, pstmt);
         }
+        return false;
     }
-    
+
     /**
      * Get user by email
-     * @param email User's email address
+     * @param email User's email
      * @return User object if found, null otherwise
      */
     public User getUserByEmail(String email) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        
-        String sql = "SELECT * FROM users WHERE email = ?";
-        
-        try {
-            conn = DBUtil.getConnection();
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, email);
+        User user = null;
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(GET_USER_BY_EMAIL)) {
             
-            rs = pstmt.executeQuery();
+            pstmt.setString(1, email);
+            ResultSet rs = pstmt.executeQuery();
             
             if (rs.next()) {
-                return extractUserFromResultSet(rs);
+                user = extractUserFromResultSet(rs);
             }
-            
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            closeResources(conn, pstmt, rs);
         }
-        
-        return null;
+        return user;
     }
-    
+
     /**
      * Get user by ID
      * @param id User's ID
      * @return User object if found, null otherwise
      */
     public User getUserById(int id) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        
-        String sql = "SELECT * FROM users WHERE id = ?";
-        
-        try {
-            conn = DBUtil.getConnection();
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, id);
+        User user = null;
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(GET_USER_BY_ID)) {
             
-            rs = pstmt.executeQuery();
+            pstmt.setInt(1, id);
+            ResultSet rs = pstmt.executeQuery();
             
             if (rs.next()) {
-                return extractUserFromResultSet(rs);
+                user = extractUserFromResultSet(rs);
             }
-            
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            closeResources(conn, pstmt, rs);
         }
-        
-        return null;
+        return user;
     }
-    
+
     /**
-     * Update user's OTP
+     * Authenticate user with email and password
      * @param email User's email
-     * @param newOtp New OTP to set
-     * @return true if updated successfully, false otherwise
+     * @param password User's password
+     * @return User object if authentication successful, null otherwise
      */
-    public boolean updateOtp(String email, int newOtp) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        
-        String sql = "UPDATE users SET otp = ? WHERE email = ?";
-        
-        try {
-            conn = DBUtil.getConnection();
-            pstmt = conn.prepareStatement(sql);
+    public User login(String email, String password) {
+        User user = null;
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(GET_USER_BY_EMAIL_AND_PASSWORD)) {
             
-            pstmt.setInt(1, newOtp);
+            pstmt.setString(1, email);
+            pstmt.setString(2, password);
+            ResultSet rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                user = extractUserFromResultSet(rs);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return user;
+    }
+
+    /**
+     * Update OTP for a user
+     * @param email User's email
+     * @param otp New OTP
+     * @return true if update successful, false otherwise
+     */
+    public boolean updateOtp(String email, int otp) {
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(UPDATE_OTP)) {
+            
+            pstmt.setInt(1, otp);
             pstmt.setString(2, email);
             
-            int result = pstmt.executeUpdate();
-            return result > 0;
-            
-        } catch (SQLException e) {
+            return pstmt.executeUpdate() > 0;
+        } catch (Exception e) {
             e.printStackTrace();
-            return false;
-        } finally {
-            closeResources(conn, pstmt);
         }
+        return false;
     }
-    
+
     /**
-     * Update verification status
+     * Verify user by email
      * @param email User's email
-     * @return true if updated successfully, false otherwise
+     * @return true if verification successful, false otherwise
      */
-    public boolean updateVerificationStatus(String email) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        
-        String sql = "UPDATE users SET is_verified = true, otp = 0 WHERE email = ?";
-        
-        try {
-            conn = DBUtil.getConnection();
-            pstmt = conn.prepareStatement(sql);
+    public boolean verifyUser(String email) {
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(VERIFY_USER)) {
             
             pstmt.setString(1, email);
-            
-            int result = pstmt.executeUpdate();
-            return result > 0;
-            
-        } catch (SQLException e) {
+            return pstmt.executeUpdate() > 0;
+        } catch (Exception e) {
             e.printStackTrace();
-            return false;
-        } finally {
-            closeResources(conn, pstmt);
         }
+        return false;
     }
-    
+
     /**
-     * Verify user by email and OTP
-     * @param email User's email
-     * @param otp One-time password to verify
-     * @return true if OTP matches and user is verified, false otherwise
+     * Get all users
+     * @return List of all users
      */
-    public boolean verifyOtp(String email, int otp) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        
-        String sql = "UPDATE users SET is_verified = true WHERE email = ? AND otp = ?";
-        
-        try {
-            conn = DBUtil.getConnection();
-            pstmt = conn.prepareStatement(sql);
+    public List<User> getAllUsers() {
+        List<User> users = new ArrayList<>();
+        try (Connection conn = DBConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(GET_ALL_USERS)) {
             
-            pstmt.setString(1, email);
-            pstmt.setInt(2, otp);
-            
-            int result = pstmt.executeUpdate();
-            return result > 0;
-            
-        } catch (SQLException e) {
+            while (rs.next()) {
+                users.add(extractUserFromResultSet(rs));
+            }
+        } catch (Exception e) {
             e.printStackTrace();
-            return false;
-        } finally {
-            closeResources(conn, pstmt);
         }
+        return users;
     }
-    
+
+    /**
+     * Delete user by ID
+     * @param id User's ID
+     * @return true if deletion successful, false otherwise
+     */
+    public boolean deleteUser(int id) {
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(DELETE_USER)) {
+            
+            pstmt.setInt(1, id);
+            return pstmt.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * Update user's password
+     * @param email User's email
+     * @param newPassword New password
+     * @return true if update successful, false otherwise
+     */
+    public boolean updatePassword(String email, String newPassword) {
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(UPDATE_PASSWORD)) {
+            
+            pstmt.setString(1, newPassword);
+            pstmt.setString(2, email);
+            return pstmt.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     /**
      * Check if email already exists
      * @param email Email to check
      * @return true if email exists, false otherwise
      */
     public boolean emailExists(String email) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        
-        String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
-        
-        try {
-            conn = DBUtil.getConnection();
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, email);
-            
-            rs = pstmt.executeQuery();
-            
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
-            }
-            
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            closeResources(conn, pstmt, rs);
-        }
-        
-        return false;
+        return getUserByEmail(email) != null;
     }
-    
+
     /**
-     * Authenticate user - login with email and password
-     * @param email User's email
-     * @param password User's password
-     * @return User object if authentication successful, null otherwise
-     */
-    public User authenticateUser(String email, String password) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        
-        String sql = "SELECT * FROM users WHERE email = ? AND password = ?";
-        
-        try {
-            conn = DBUtil.getConnection();
-            pstmt = conn.prepareStatement(sql);
-            
-            pstmt.setString(1, email);
-            pstmt.setString(2, password);
-            
-            rs = pstmt.executeQuery();
-            
-            if (rs.next()) {
-                return extractUserFromResultSet(rs);
-            }
-            
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            closeResources(conn, pstmt, rs);
-        }
-        
-        return null;
-    }
-    
-    /**
-     * Validate user login (requires verified account)
-     * @param email User's email
-     * @param password User's password
-     * @return User object if login successful, null otherwise
-     */
-    public User login(String email, String password) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        
-        String sql = "SELECT * FROM users WHERE email = ? AND password = ? AND is_verified = true";
-        
-        try {
-            conn = DBUtil.getConnection();
-            pstmt = conn.prepareStatement(sql);
-            
-            pstmt.setString(1, email);
-            pstmt.setString(2, password);
-            
-            rs = pstmt.executeQuery();
-            
-            if (rs.next()) {
-                return extractUserFromResultSet(rs);
-            }
-            
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            closeResources(conn, pstmt, rs);
-        }
-        
-        return null;
-    }
-    
-    /**
-     * Extract user data from ResultSet
-     * @param rs ResultSet containing user data
-     * @return User object
-     * @throws SQLException if database access error occurs
+     * Helper method to extract User from ResultSet
      */
     private User extractUserFromResultSet(ResultSet rs) throws SQLException {
         User user = new User();
@@ -315,38 +235,5 @@ public class UserDao {
         user.setVerified(rs.getBoolean("is_verified"));
         user.setCreatedAt(rs.getTimestamp("created_at"));
         return user;
-    }
-    
-    /**
-     * Close database resources
-     * @param conn Connection to close
-     * @param pstmt PreparedStatement to close
-     */
-    private void closeResources(Connection conn, PreparedStatement pstmt) {
-        if (pstmt != null) {
-            try {
-                pstmt.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        DBUtil.closeConnection(conn);
-    }
-    
-    /**
-     * Close database resources including ResultSet
-     * @param conn Connection to close
-     * @param pstmt PreparedStatement to close
-     * @param rs ResultSet to close
-     */
-    private void closeResources(Connection conn, PreparedStatement pstmt, ResultSet rs) {
-        if (rs != null) {
-            try {
-                rs.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        closeResources(conn, pstmt);
     }
 }
