@@ -31,8 +31,45 @@
 
             <div class="nav-right">
                 <a href="#" class="btn-outline" id="nav-tickets">🎫 My Tickets</a>
-                <a href="user-login.jsp" id="nav-login">Login</a>
-                <a href="user-signup.jsp" class="btn-primary" id="nav-signup">Sign Up</a>
+                <%
+                    // Check if user is logged in
+                    Integer loggedInUserId = (Integer) session.getAttribute("userId");
+                    String loggedInUserName = (String) session.getAttribute("userName");
+                    
+                    if (loggedInUserId != null) {
+                %>
+                    <!-- User is logged in - show profile dropdown -->
+                    <div class="user-profile-dropdown">
+                        <button class="profile-btn" id="nav-profile" onclick="toggleDropdown()">
+                            <span class="profile-avatar-small">👤</span>
+                            <span class="profile-name-small"><%= loggedInUserName %></span>
+                            <span class="dropdown-arrow">▼</span>
+                        </button>
+                        <div class="dropdown-menu" id="dropdown-menu">
+                            <a href="<%= request.getContextPath() %>/ProfileServlet" class="dropdown-item">
+                                <span>👤</span> My Profile
+                            </a>
+                            <a href="#" class="dropdown-item">
+                                <span>🎫</span> My Tickets
+                            </a>
+                            <a href="#" class="dropdown-item">
+                                <span>⚙️</span> Settings
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="<%= request.getContextPath() %>/ProfileServlet?action=logout" class="dropdown-item logout">
+                                <span>🚪</span> Logout
+                            </a>
+                        </div>
+                    </div>
+                <%
+                    } else {
+                %>
+                    <!-- User is not logged in - show login and signup buttons -->
+                    <a href="user-login.jsp" id="nav-login">Login</a>
+                    <a href="user-signup.jsp" class="btn-primary" id="nav-signup">Sign Up</a>
+                <%
+                    }
+                %>
             </div>
         </header>
 
@@ -531,6 +568,27 @@
 
         <!-- ==================== SCRIPTS ==================== -->
         <script src="js/slider.js" defer></script>
+        <script>
+            // Toggle dropdown menu
+            function toggleDropdown() {
+                var dropdown = document.getElementById('dropdown-menu');
+                var btn = document.getElementById('nav-profile');
+                dropdown.classList.toggle('show');
+                btn.classList.toggle('active');
+            }
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                var dropdown = document.getElementById('dropdown-menu');
+                var btn = document.getElementById('nav-profile');
+                if (dropdown && btn) {
+                    if (!dropdown.contains(event.target) && !btn.contains(event.target)) {
+                        dropdown.classList.remove('show');
+                        btn.classList.remove('active');
+                    }
+                }
+            });
+        </script>
 
     </body>
 
