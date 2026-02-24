@@ -1,267 +1,182 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.sql.Timestamp" %>
 <%@ page import="java.text.SimpleDateFormat" %>
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile | EventHub</title>
     <link rel="stylesheet" href="css/user-style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .profile-container {
-            max-width: 600px;
-            margin: 40px auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-        }
-
-        .profile-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 40px 30px;
-            text-align: center;
-            color: white;
-        }
-
-        .profile-avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: white;
+        
+        .profile-item {
             display: flex;
             align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 48px;
-            color: #667eea;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
         }
-
-        .profile-name {
-            font-size: 28px;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .profile-email {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        .profile-body {
-            padding: 30px;
-        }
-
-        .profile-info-item {
-            display: flex;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .profile-info-item:last-child {
-            border-bottom: none;
-        }
-
-        .profile-info-icon {
+        
+        .profile-item i {
             width: 40px;
             height: 40px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            background: rgba(245, 158, 11, 0.1);
+            border-radius: 10px;
+            color: var(--brand-primary);
             font-size: 18px;
-            margin-right: 15px;
+            margin-right: 16px;
         }
-
-        .profile-info-content {
+        
+        .profile-item .item-content {
             flex: 1;
         }
-
-        .profile-info-label {
+        
+        .profile-item .item-label {
             font-size: 12px;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
         }
-
-        .profile-info-value {
-            font-size: 16px;
-            color: #333;
+        
+        .profile-item .item-value {
+            font-size: 15px;
+            color: var(--text-primary);
             font-weight: 500;
         }
-
+        
         .profile-actions {
-            padding: 0 30px 30px;
             display: flex;
-            gap: 15px;
+            gap: 12px;
+            margin-top: 24px;
         }
-
-        .btn {
+        
+        .btn-profile {
             flex: 1;
-            padding: 15px 20px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
+            transition: all var(--transition-smooth);
             text-align: center;
+            text-decoration: none;
         }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        
+        .btn-profile-primary {
+            background: var(--gradient-brand);
             color: white;
+            border: none;
         }
-
-        .btn-primary:hover {
+        
+        .btn-profile-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
         }
-
-        .btn-outline {
-            background: transparent;
-            color: #667eea;
-            border: 2px solid #667eea;
+        
+        .btn-profile-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
         }
-
-        .btn-outline:hover {
-            background: #667eea;
-            color: white;
-        }
-
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #c82333;
-            box-shadow: 0 5px 20px rgba(220, 53, 69, 0.4);
-        }
-
-        .error-message {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            color: #667eea;
-            text-decoration: none;
-            padding: 20px 30px;
-            font-weight: 600;
-        }
-
-        .back-link:hover {
-            text-decoration: underline;
+        
+        .btn-profile-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--brand-primary);
         }
     </style>
 </head>
+
 <body>
 
-    <div class="profile-container">
-        <%
-            // Check if user is logged in
-            Integer userId = (Integer) session.getAttribute("userId");
-            String userName = (String) session.getAttribute("userName");
-            
-            if (userId == null) {
-                response.sendRedirect(request.getContextPath() + "/user-login.jsp");
-                return;
-            }
-            
-            String error = (String) request.getAttribute("error");
-            if (error != null) {
-        %>
-            <div class="error-message"><%= error %></div>
-        <%
-            }
-        %>
-        
-        <div class="profile-header">
-            <div class="profile-avatar">
-                <%= userName != null && !userName.isEmpty() ? userName.charAt(0) : 'U' %>
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            <div class="auth-header">
+                <a href="index.jsp" class="logo">EventHub</a>
+                <h2>My Profile</h2>
+                <p>View your account information</p>
             </div>
-            <h1 class="profile-name"><%= request.getAttribute("userName") != null ? request.getAttribute("userName") : userName %></h1>
-            <p class="profile-email"><%= request.getAttribute("userEmail") != null ? request.getAttribute("userEmail") : "" %></p>
-        </div>
 
-        <div class="profile-body">
-            <div class="profile-info-item">
-                <div class="profile-info-icon">👤</div>
-                <div class="profile-info-content">
-                    <div class="profile-info-label">Full Name</div>
-                    <div class="profile-info-value"><%= request.getAttribute("userName") != null ? request.getAttribute("userName") : userName %></div>
+            <%-- Error/Success Messages --%>
+            <% if (request.getAttribute("error") != null) { %>
+                <div class="alert alert-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <%= request.getAttribute("error") %>
                 </div>
-            </div>
-
-            <div class="profile-info-item">
-                <div class="profile-info-icon">📧</div>
-                <div class="profile-info-content">
-                    <div class="profile-info-label">Email Address</div>
-                    <div class="profile-info-value"><%= request.getAttribute("userEmail") != null ? request.getAttribute("userEmail") : "" %></div>
+            <% } %>
+            <% if (request.getAttribute("success") != null) { %>
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    <%= request.getAttribute("success") %>
                 </div>
-            </div>
+            <% } %>
 
-            <div class="profile-info-item">
-                <div class="profile-info-icon">🎫</div>
-                <div class="profile-info-content">
-                    <div class="profile-info-label">User ID</div>
-                    <div class="profile-info-value">#<%= request.getAttribute("userId") != null ? request.getAttribute("userId") : userId %></div>
+            <div class="profile-info">
+                <div class="profile-item">
+                    <i class="fas fa-user"></i>
+                    <div class="item-content">
+                        <div class="item-label">Full Name</div>
+                        <div class="item-value"><%= request.getAttribute("userName") != null ? request.getAttribute("userName") : "N/A" %></div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="profile-info-item">
-                <div class="profile-info-icon">📅</div>
-                <div class="profile-info-content">
-                    <div class="profile-info-label">Member Since</div>
-                    <div class="profile-info-value">
-                        <%
-                            Timestamp createdAt = (Timestamp) request.getAttribute("createdAt");
-                            if (createdAt != null) {
-                                SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy");
-                                out.print(sdf.format(createdAt));
-                            } else {
-                                out.print("N/A");
-                            }
-                        %>
+                <div class="profile-item">
+                    <i class="fas fa-envelope"></i>
+                    <div class="item-content">
+                        <div class="item-label">Email Address</div>
+                        <div class="item-value"><%= request.getAttribute("userEmail") != null ? request.getAttribute("userEmail") : "N/A" %></div>
+                    </div>
+                </div>
+
+                <div class="profile-item">
+                    <i class="fas fa-id-badge"></i>
+                    <div class="item-content">
+                        <div class="item-label">User ID</div>
+                        <div class="item-value">#<%= request.getAttribute("userId") != null ? request.getAttribute("userId") : "N/A" %></div>
+                    </div>
+                </div>
+
+                <div class="profile-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <div class="item-content">
+                        <div class="item-label">Member Since</div>
+                        <div class="item-value">
+                            <% 
+                                Object createdAt = request.getAttribute("createdAt");
+                                if (createdAt != null) {
+                                    SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy");
+                                    out.print(sdf.format(createdAt));
+                                } else {
+                                    out.print("N/A");
+                                }
+                            %>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="profile-actions">
-            <a href="<%= request.getContextPath() %>/index.jsp" class="btn btn-primary">🏠 Back to Home</a>
-            <a href="<%= request.getContextPath() %>/ProfileServlet?action=logout" class="btn btn-danger">🚪 Logout</a>
+            <div class="profile-actions">
+                <a href="index.jsp" class="btn-profile btn-profile-secondary">
+                    <i class="fas fa-home"></i> Back to Home
+                </a>
+                <a href="<%= request.getContextPath() %>/ProfileServlet?action=logout" class="btn-profile btn-profile-primary">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
         </div>
     </div>
 
 </body>
+
 </html>
