@@ -14,8 +14,8 @@ public class EmailUtil {
 
     public static void sendOTP(String toEmail, String otp) throws Exception {
 
-        final String fromEmail = "mvsv18k@gmail.com";
-        final String password = "bypzugpwkpuvszqt"; // Gmail App Password
+        final String fromEmail = "event.hub.webapp1@gmail.com";
+        final String password = "xsdy xovs soxq ggpi"; // Gmail App Password
 
         Properties props = new Properties();
         props.put("mail.smtp.host", "smtp.gmail.com");
@@ -29,7 +29,7 @@ public class EmailUtil {
                         return new PasswordAuthentication(fromEmail, password);
                     }
                 });
-
+ 
         Message message = new MimeMessage(session);
         message.setFrom(new InternetAddress(fromEmail));
         message.setRecipients(Message.RecipientType.TO,
@@ -79,8 +79,8 @@ public class EmailUtil {
     
     public static void sendRegistrationSuccess(String toEmail, String userName) throws Exception {
 
-        final String fromEmail = "mvsv18k@gmail.com";
-        final String password = "bypzugpwkpuvszqt"; // Gmail App Password
+        final String fromEmail = "event.hub.webapp1@gmail.com";
+        final String password = "xsdy xovs soxq ggpi"; // Gmail App Password
 
         Properties props = new Properties();
         props.put("mail.smtp.host", "smtp.gmail.com");

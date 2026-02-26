@@ -1,17 +1,7 @@
-/* ====================================================
-   EventHub – Premium Home Page Styles
-   ====================================================
-   Design Tokens & Philosophy:
-   - Dark, immersive palette with warm amber / soft violet accents
-   - Glassmorphism navigation & card effects
-   - Micro-animations (hover lifts, fades, parallax feel)
-   - Smooth scroll & buttery transitions everywhere
-   ==================================================== */
 
-/* ---------- Google Fonts ---------- */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
-/* ---------- CSS Variables ---------- */
+
 :root {
     --brand-primary: #f59e0b;
     --brand-primary-light: #fbbf24;
@@ -48,7 +38,7 @@
     --transition-smooth: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ---------- Reset & Base ---------- */
+
 *,
 *::before,
 *::after {
@@ -102,7 +92,7 @@ img {
     padding: 0 24px;
 }
 
-/* ---------- Section Titles ---------- */
+
 .section-header {
     text-align: center;
     margin-bottom: 60px;
@@ -142,9 +132,7 @@ img {
     line-height: 1.7;
 }
 
-/* =============================================
-   NAVBAR
-   ============================================= */
+
 .navbar {
     position: fixed;
     top: 0;
@@ -287,9 +275,7 @@ img {
     color: var(--brand-primary-light);
 }
 
-/* =============================================
-   HERO SECTION
-   ============================================= */
+
 .hero {
     position: relative;
     min-height: 100vh;
@@ -484,7 +470,7 @@ img {
     margin-top: 4px;
 }
 
-/* Slider dots */
+
 .slider-dots {
     position: absolute;
     bottom: 100px;

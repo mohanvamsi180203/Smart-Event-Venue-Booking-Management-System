@@ -17,7 +17,6 @@
 
     <body>
 
-        <!-- ==================== NAVBAR ==================== -->
         <header class="navbar" id="navbar">
             <div class="nav-left">
                 <h1 class="logo">EventHub</h1>
@@ -73,7 +72,7 @@
             </div>
         </header>
 
-        <!-- ==================== HERO SECTION ==================== -->
+       
         <section class="hero" id="hero">
             <div class="hero-slider">
                 <img class="slide active" src="images/concert.jpg" alt="Live Concert Event">
@@ -122,7 +121,7 @@
                 </div>
             </div>
 
-            <!-- Slider Navigation Dots -->
+           
             <div class="slider-dots" id="slider-dots">
                 <span class="slider-dot active" data-index="0"></span>
                 <span class="slider-dot" data-index="1"></span>
@@ -136,7 +135,7 @@
             </div>
         </section>
 
-        <!-- ==================== CATEGORIES ==================== -->
+       
         <section class="categories" id="categories">
             <div class="category reveal" id="cat-concerts">
                 <span class="cat-icon">🎪</span>
@@ -164,7 +163,7 @@
             </div>
         </section>
 
-        <!-- ==================== FEATURED EVENTS ==================== -->
+       
         <section class="featured-events" id="featured-events">
             <div class="container">
                 <div class="section-header reveal">
@@ -200,7 +199,7 @@
                         </div>
                     </div>
 
-                    <!-- Event Card 2 -->
+                    
                     <div class="event-card reveal reveal-delay-1" id="event-2">
                         <div class="event-card-image">
                             <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=600&q=80"
@@ -224,7 +223,7 @@
                         </div>
                     </div>
 
-                    <!-- Event Card 3 -->
+                  
                     <div class="event-card reveal reveal-delay-2" id="event-3">
                         <div class="event-card-image">
                             <img src="https://images.unsplash.com/photo-1431540015160-0bd15f3b58af?w=600&q=80"
@@ -248,7 +247,7 @@
                         </div>
                     </div>
 
-                    <!-- Event Card 4 -->
+                    
                     <div class="event-card reveal" id="event-4">
                         <div class="event-card-image">
                             <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600&q=80"
@@ -272,7 +271,7 @@
                         </div>
                     </div>
 
-                    <!-- Event Card 5 -->
+                   
                     <div class="event-card reveal reveal-delay-1" id="event-5">
                         <div class="event-card-image">
                             <img src="https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=600&q=80"
@@ -296,7 +295,7 @@
                         </div>
                     </div>
 
-                    <!-- Event Card 6 -->
+                 
                     <div class="event-card reveal reveal-delay-2" id="event-6">
                         <div class="event-card-image">
                             <img src="https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?w=600&q=80"
@@ -323,7 +322,7 @@
             </div>
         </section>
 
-        <!-- ==================== HOW IT WORKS ==================== -->
+     
         <section class="how-it-works" id="how-it-works">
             <div class="container">
                 <div class="section-header reveal">
@@ -371,7 +370,7 @@
             </div>
         </section>
 
-        <!-- ==================== VENUES SHOWCASE ==================== -->
+      
         <section class="venues-section" id="venues">
             <div class="container">
                 <div class="section-header reveal">
@@ -439,7 +438,7 @@
             </div>
         </section>
 
-        <!-- ==================== TESTIMONIALS ==================== -->
+       
         <section class="testimonials" id="testimonials">
             <div class="container">
                 <div class="section-header reveal">
@@ -493,7 +492,7 @@
             </div>
         </section>
 
-        <!-- ==================== CTA / NEWSLETTER ==================== -->
+      
         <section class="cta-section" id="cta">
             <div class="container">
                 <div class="cta-box reveal">
@@ -508,7 +507,7 @@
             </div>
         </section>
 
-        <!-- ==================== FOOTER ==================== -->
+       
         <footer class="footer" id="footer">
             <div class="container">
                 <div class="footer-grid">
@@ -566,7 +565,7 @@
             </div>
         </footer>
 
-        <!-- ==================== SCRIPTS ==================== -->
+
         <script src="js/slider.js" defer></script>
         <script>
             // Toggle dropdown menu
