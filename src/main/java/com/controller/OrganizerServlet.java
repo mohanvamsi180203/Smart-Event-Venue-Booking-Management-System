@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Time;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.mindrot.jbcrypt.BCrypt;
@@ -11,9 +12,11 @@ import org.mindrot.jbcrypt.BCrypt;
 import com.dao.CategoryDao;
 import com.dao.EventDao;
 import com.dao.OrganizerDao;
+import com.dao.SectionDao;
 import com.dto.Category;
 import com.dto.Event;
 import com.dto.Organizer;
+import com.dto.Section;
 import com.util.EmailUtil;
 
 import jakarta.servlet.ServletException;
@@ -62,13 +65,14 @@ public class OrganizerServlet extends HttpServlet {
             action = ACTION_DASHBOARD;
         }
         
-        switch (action) {
+switch (action) {
             case ACTION_LOGOUT:
                 handleLogout(request, response);
                 break;
             case ACTION_DASHBOARD:
             case ACTION_VIEW_MY_EVENTS:
             case ACTION_EDIT_EVENT:
+            case ACTION_ADD_EVENT:
                 handleGetRequest(request, response, action);
                 break;
             default:
@@ -250,7 +254,7 @@ public class OrganizerServlet extends HttpServlet {
             return;
         }
         
-        switch (action) {
+switch (action) {
             case ACTION_DASHBOARD:
                 showDashboard(request, response);
                 break;
@@ -259,6 +263,9 @@ public class OrganizerServlet extends HttpServlet {
                 break;
             case ACTION_EDIT_EVENT:
                 showEditEvent(request, response);
+                break;
+            case ACTION_ADD_EVENT:
+                showAddEventForm(request, response);
                 break;
             default:
                 showDashboard(request, response);
@@ -307,7 +314,7 @@ public class OrganizerServlet extends HttpServlet {
         request.getRequestDispatcher("/organizer/my-events.jsp").forward(request, response);
     }
     
-    /**
+/**
      * Show edit event form
      */
     private void showEditEvent(HttpServletRequest request, HttpServletResponse response)
@@ -333,7 +340,19 @@ public class OrganizerServlet extends HttpServlet {
     }
     
     /**
-     * Add new event
+     * Show add event form
+     */
+    private void showAddEventForm(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        List<Category> categories = categoryDao.getActiveCategories();
+        request.setAttribute("categories", categories);
+        
+        request.getRequestDispatcher("/organizer/edit-event.jsp").forward(request, response);
+    }
+    
+    /**
+     * Add new event with sections
      */
     private void handleAddEvent(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -363,7 +382,46 @@ public class OrganizerServlet extends HttpServlet {
                                      venueName, eventDate, eventTime, ticketPrice, totalSeats);
             event.setPosterUrl(posterUrl);
             
+            // Check if using sections (dynamic seat layout)
+            String[] sectionNames = request.getParameterValues("sectionName[]");
+            String[] sectionRows = request.getParameterValues("sectionRows[]");
+            String[] sectionSeatsPerRow = request.getParameterValues("sectionSeatsPerRow[]");
+            String[] sectionPrices = request.getParameterValues("sectionPrice[]");
+            
+            List<Section> sections = new ArrayList<>();
+            int calculatedTotalSeats = 0;
+            
+            if (sectionNames != null && sectionNames.length > 0) {
+                for (int i = 0; i < sectionNames.length; i++) {
+                    if (sectionNames[i] != null && !sectionNames[i].trim().isEmpty()) {
+                        Section section = new Section();
+                        section.setSectionName(sectionNames[i].trim());
+                        section.setRows(Integer.parseInt(sectionRows[i]));
+                        section.setSeatsPerRow(Integer.parseInt(sectionSeatsPerRow[i]));
+                        section.setPrice(new BigDecimal(sectionPrices[i]));
+                        section.setRowStartLabel("A");
+                        sections.add(section);
+                        calculatedTotalSeats += section.getRows() * section.getSeatsPerRow();
+                    }
+                }
+                // Override total seats with calculated from sections
+                event.setTotalSeats(calculatedTotalSeats);
+                event.setAvailableSeats(calculatedTotalSeats);
+            }
+            
             boolean success = eventDao.addEvent(event);
+            
+            if (success && !sections.isEmpty()) {
+                // Get the event ID (last inserted)
+                int eventId = event.getId();
+                
+                // Save sections and generate seats
+                SectionDao sectionDao = new SectionDao();
+                sectionDao.insertSections(eventId, sections);
+                
+                // Generate seats from sections
+                sectionDao.generateSeatsFromSections(eventId);
+            }
             
             if (success) {
                 response.sendRedirect(request.getContextPath() + "/OrganizerServlet?action=dashboard&success=Event added successfully! Pending approval.");

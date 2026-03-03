@@ -7,6 +7,7 @@ USE eventhub_db;
 CREATE TABLE IF NOT EXISTS event_seats (
     seat_id INT AUTO_INCREMENT PRIMARY KEY,
     event_id INT NOT NULL,
+    section_id INT DEFAULT NULL,
     seat_number VARCHAR(10) NOT NULL,
     row_label VARCHAR(5) NOT NULL,
     seat_column INT NOT NULL,
@@ -17,9 +18,14 @@ CREATE TABLE IF NOT EXISTS event_seats (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+    FOREIGN KEY (section_id) REFERENCES sections(id) ON DELETE SET NULL,
     FOREIGN KEY (locked_by) REFERENCES users(id) ON DELETE SET NULL,
     UNIQUE KEY unique_event_seat (event_id, seat_number)
 );
+
+-- Add section_id column if it doesn't exist (for existing tables)
+-- ALTER TABLE event_seats ADD COLUMN section_id INT DEFAULT NULL AFTER event_id;
+-- ALTER TABLE event_seats ADD FOREIGN KEY (section_id) REFERENCES sections(id) ON DELETE SET NULL;
 
 -- 2. Create booking_seats table for many-to-many relationship
 CREATE TABLE IF NOT EXISTS booking_seats (

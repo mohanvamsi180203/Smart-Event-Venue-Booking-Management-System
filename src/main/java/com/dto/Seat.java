@@ -10,6 +10,8 @@ public class Seat {
     private Integer lockedBy;
     private java.sql.Timestamp lockTime;
     private Integer bookingId;
+    private Integer sectionId; // Link to sections table
+    private String sectionName; // For display purposes
     
     public Seat() {}
     
@@ -103,5 +105,22 @@ public class Seat {
     
     public boolean isBooked() {
         return "BOOKED".equals(status);
+    }
+    
+    // Section-related getters and setters
+    public Integer getSectionId() {
+        return sectionId;
+    }
+    
+    public void setSectionId(Integer sectionId) {
+        this.sectionId = sectionId;
+    }
+    
+    public String getSectionName() {
+        return sectionName;
+    }
+    
+    public void setSectionName(String sectionName) {
+        this.sectionName = sectionName;
     }
 }

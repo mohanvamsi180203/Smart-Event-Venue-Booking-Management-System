@@ -35,16 +35,17 @@ public class BookingServlet extends HttpServlet {
         HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("userId");
         
-        if (userId == null) {
-            sendJsonResponse(response, false, "User not logged in. Please login first.");
-            return;
-        }
-        
         String action = request.getParameter("action");
         
         // Null check - return JSON error if action is null
         if (action == null) {
             sendJsonResponse(response, false, "Action parameter is required");
+            return;
+        }
+        
+        // Allow getSeats without login - others require login
+        if (!"getSeats".equals(action) && userId == null) {
+            sendJsonResponse(response, false, "User not logged in. Please login first.");
             return;
         }
         
@@ -123,7 +124,7 @@ public class BookingServlet extends HttpServlet {
             json.append("}");
         }
         
-        json.append("]}");
+        json.append("],\"userLoggedIn\":").append(userId != null).append("}");
         
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");

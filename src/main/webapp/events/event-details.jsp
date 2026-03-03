@@ -109,10 +109,10 @@
         }
         
         .content-wrapper {
-            display: grid;
-            grid-template-columns: 1fr 360px;
+            display: flex;
+            flex-direction: column;
             gap: 32px;
-            align-items: start;
+            align-items: stretch;
         }
         
         /* Left Column */
@@ -120,6 +120,7 @@
             display: flex;
             flex-direction: column;
             gap: 24px;
+            width: 100%;
         }
         
         /* Info Cards */

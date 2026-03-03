@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.List;
 
 /**
  * Event Data Transfer Object
@@ -32,6 +33,9 @@ public class Event {
     private boolean isFeatured;
     private Timestamp createdAt;
     private Timestamp updatedAt;
+    
+    // Dynamic sections for seat layout
+    private List<Section> sections;
     
     // Default constructor
     public Event() {
@@ -120,6 +124,10 @@ public class Event {
     
     public Timestamp getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(Timestamp updatedAt) { this.updatedAt = updatedAt; }
+    
+    // Sections for dynamic seat layout
+    public List<Section> getSections() { return sections; }
+    public void setSections(List<Section> sections) { this.sections = sections; }
     
     @Override
     public String toString() {

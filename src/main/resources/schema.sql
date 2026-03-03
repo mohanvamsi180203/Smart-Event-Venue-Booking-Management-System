@@ -97,6 +97,24 @@ CREATE TABLE IF NOT EXISTS events (
 );
 
 -- =====================================================
+-- Sections Table (for dynamic seat layout)
+-- =====================================================
+CREATE TABLE IF NOT EXISTS sections (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    event_id INT NOT NULL,
+    section_name VARCHAR(50) NOT NULL,
+    rows INT NOT NULL,
+    seats_per_row INT NOT NULL,
+    price DECIMAL(10,2) NOT NULL,
+    row_start_label VARCHAR(5) DEFAULT 'A',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    INDEX idx_event_id (event_id),
+    
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
+);
+
+-- =====================================================
 -- Users Table (already exists, adding location column)
 -- Note: These columns will be added only if they don't exist and if the table exists
 

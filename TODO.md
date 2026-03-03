@@ -1,32 +1,20 @@
-# Smart EventHub - Implementation TODO
+# TODO - Dynamic Section-Based Seat Layout System
 
-## Phase 1: Admin Dashboard Fixes
-- [ ] 1. Fix AdminServlet - ensure all actions forward to correct JSP pages in admin folder
-- [ ] 2. Fix Quick Actions links in admin-dashboard.jsp
-- [ ] 3. Add missing admin JSP pages (organizers.jsp, events.jsp, categories.jsp, bookings.jsp)
+## Task: Implement dynamic seat layout where organizers define sections with rows, seats per row, and pricing
 
-## Phase 2: EventServlet Improvements
-- [ ] 4. Add search functionality in EventServlet
-- [ ] 5. Add combined filtering (category + city) in EventServlet
-- [ ] 6. Fix filterByCategory and filterByCity methods
-- [ ] 7. Add "myBookings" action
+### Steps:
+- [x] 1. Create Section.java DTO class
+- [x] 2. Create SectionDao.java for CRUD operations and seat generation
+- [x] 3. Update schema.sql with sections table
+- [x] 4. Update Event.java DTO to include List<Section>
+- [x] 5. Update Seat.java to include sectionId and sectionName
+- [x] 6. Update OrganizerServlet.java to handle section data
+- [x] 7. Update seat_booking_schema.sql to add section_id column
+- [ ] 8. Update organizer dashboard JSP with dynamic section form (UI)
 
-## Phase 3: Home Page Improvements
-- [ ] 8. Add location selection dropdown on homepage
-- [ ] 9. Update index.jsp to load events from database
-- [ ] 10. Add category filtering on homepage
-- [ ] 11. Make event cards clickable to event-details.jsp
+### How it works:
+1. Organizer creates event with sections (each section has: name, rows, seats per row, price)
+2. Backend saves sections to database
+3. Backend automatically generates seats based on section configuration
+4. Users can then book individual seats from the generated seat map
 
-## Phase 4: Booking Functionality
-- [ ] 12. Update events-list.jsp with proper booking links
-- [ ] 13. Create my-bookings.jsp page
-- [ ] 14. Ensure booking stores data in bookings table
-
-## Phase 5: Session & Security
-- [ ] 15. Add session validation to all protected pages
-- [ ] 16. Add role checks for admin, organizer, user dashboards
-- [ ] 17. Fix user-login.jsp to be unified login page
-
-## Phase 6: CSS Consolidation
-- [ ] 18. Use styles.css as main CSS for all pages
-- [ ] 19. Remove or merge admin-style.css and organizer-dashboard.css references

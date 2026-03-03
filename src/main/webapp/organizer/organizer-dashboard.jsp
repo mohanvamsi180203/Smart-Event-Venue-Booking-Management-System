@@ -386,6 +386,7 @@
             <div class="events-section">
                 <div class="section-header">
                     <h2>My Events</h2>
+                    <a href="<%= request.getContextPath() %>/OrganizerServlet?action=addEvent" class="btn-add-event">+ Add Event</a>
                 </div>
                 
                 <% if (events != null && !events.isEmpty()) { %>
