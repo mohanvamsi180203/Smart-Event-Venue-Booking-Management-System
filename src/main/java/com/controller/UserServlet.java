@@ -32,6 +32,8 @@ public class UserServlet extends HttpServlet {
     private static final String ACTION_RESEND_OTP = "resendOtp";
     private static final String ACTION_LOGIN = "login";
     private static final String ACTION_LOGOUT = "logout";
+    private static final String ACTION_ADMIN_LOGIN = "adminLogin";
+    private static final String ACTION_ORGANIZER_LOGIN = "organizerLogin";
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -56,6 +58,12 @@ public class UserServlet extends HttpServlet {
                 break;
             case ACTION_LOGIN:
                 handleLogin(request, response);
+                break;
+            case ACTION_ADMIN_LOGIN:
+                handleAdminLogin(request, response);
+                break;
+            case ACTION_ORGANIZER_LOGIN:
+                handleOrganizerLogin(request, response);
                 break;
             default:
                 response.sendRedirect("index.jsp");
@@ -383,5 +391,128 @@ public class UserServlet extends HttpServlet {
      */
     private int generateOtp() {
         return 100000 + random.nextInt(900000);
+    }
+    
+    /**
+     * Handle admin login from unified login page
+     */
+    private void handleAdminLogin(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+        
+        if (username == null || username.trim().isEmpty() ||
+            password == null || password.trim().isEmpty()) {
+            request.setAttribute("error", "Username and password are required!");
+            request.getRequestDispatcher("user-login.jsp").forward(request, response);
+            return;
+        }
+        
+        try (Connection con = DBConnection.getConnection()) {
+            String sql = "SELECT * FROM admin WHERE username = ?";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, username);
+            
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                String storedPassword = rs.getString("password");
+                
+                // Support both BCrypt and plain text passwords for testing
+                boolean passwordValid = false;
+                if (storedPassword != null) {
+                    if (storedPassword.startsWith("$2")) {
+                        // BCrypt hash
+                        passwordValid = BCrypt.checkpw(password, storedPassword);
+                    } else {
+                        // Plain text password (for testing)
+                        passwordValid = storedPassword.equals(password);
+                    }
+                }
+                
+                if (passwordValid) {
+                    HttpSession session = request.getSession();
+                    session.setAttribute("adminId", rs.getInt("id"));
+                    session.setAttribute("adminUsername", rs.getString("username"));
+                    session.setAttribute("adminEmail", rs.getString("email"));
+                    session.setAttribute("adminFullName", rs.getString("full_name"));
+                    
+                    response.sendRedirect(request.getContextPath() + "/AdminServlet?action=dashboard");
+                    return;
+                } else {
+                    request.setAttribute("error", "Invalid password!");
+                    request.getRequestDispatcher("user-login.jsp").forward(request, response);
+                    return;
+                }
+            }
+            
+            request.setAttribute("error", "Invalid admin credentials!");
+            request.getRequestDispatcher("user-login.jsp").forward(request, response);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Login failed! Please try again.");
+            request.getRequestDispatcher("user-login.jsp").forward(request, response);
+        }
+    }
+    
+    /**
+     * Handle organizer login from unified login page
+     */
+    private void handleOrganizerLogin(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        String email = request.getParameter("email");
+        String password = request.getParameter("password");
+        
+        if (email == null || email.trim().isEmpty() ||
+            password == null || password.trim().isEmpty()) {
+            request.setAttribute("error", "Email and password are required!");
+            request.getRequestDispatcher("user-login.jsp").forward(request, response);
+            return;
+        }
+        
+        try (Connection con = DBConnection.getConnection()) {
+            String sql = "SELECT * FROM organizer WHERE email = ?";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, email);
+            
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                // Check if approved
+                if (!"approved".equals(rs.getString("status"))) {
+                    request.setAttribute("error", "Your account is " + rs.getString("status") + ". Please wait for admin approval.");
+                    request.getRequestDispatcher("user-login.jsp").forward(request, response);
+                    return;
+                }
+                
+                String hashedPassword = rs.getString("password");
+                
+                if (BCrypt.checkpw(password, hashedPassword)) {
+                    HttpSession session = request.getSession();
+                    session.setAttribute("organizerId", rs.getInt("id"));
+                    session.setAttribute("organizerName", rs.getString("name"));
+                    session.setAttribute("organizerEmail", rs.getString("email"));
+                    session.setAttribute("organizerCompany", rs.getString("company_name"));
+                    
+                    response.sendRedirect(request.getContextPath() + "/OrganizerServlet?action=dashboard");
+                    return;
+                } else {
+                    request.setAttribute("error", "Invalid password!");
+                    request.getRequestDispatcher("user-login.jsp").forward(request, response);
+                    return;
+                }
+            }
+            
+            request.setAttribute("error", "Email not registered!");
+            request.getRequestDispatcher("user-login.jsp").forward(request, response);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Login failed! Please try again.");
+            request.getRequestDispatcher("user-login.jsp").forward(request, response);
+        }
     }
 }

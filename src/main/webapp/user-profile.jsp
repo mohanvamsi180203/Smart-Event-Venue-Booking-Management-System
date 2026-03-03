@@ -1,6 +1,16 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.sql.Timestamp" %>
 <%@ page import="java.text.SimpleDateFormat" %>
+<%
+    // Check if user is logged in
+    Integer userId = (Integer) session.getAttribute("userId");
+    if (userId == null) {
+        response.sendRedirect(request.getContextPath() + "/user-login.jsp");
+        return;
+    }
+    String userName = (String) session.getAttribute("userName");
+    String userEmail = (String) session.getAttribute("userEmail");
+%>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,10 +18,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile | EventHub</title>
-    <link rel="stylesheet" href="css/user-style.css">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/styles.css">
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        body {
+            background: var(--bg-dark);
+            padding-top: 80px;
+        }
+        
+        .profile-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+        
+        .profile-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 40px;
+        }
+        
+        .profile-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .profile-header .logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            background: var(--gradient-brand);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: block;
+            margin-bottom: 8px;
+            text-decoration: none;
+        }
+        
+        .profile-header h2 {
+            font-size: 24px;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .profile-header p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
         .profile-info {
             display: flex;
             flex-direction: column;
@@ -22,7 +79,7 @@
             display: flex;
             align-items: center;
             padding: 16px;
-            background: rgba(255, 255, 255, 0.04);
+            background: var(--surface);
             border: 1px solid var(--border-color);
             border-radius: 12px;
         }
@@ -69,7 +126,7 @@
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: all var(--transition-smooth);
+            transition: all 0.3s;
             text-align: center;
             text-decoration: none;
         }
@@ -86,24 +143,45 @@
         }
         
         .btn-profile-secondary {
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--surface);
             color: var(--text-primary);
             border: 1px solid var(--border-color);
         }
         
         .btn-profile-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--bg-card-hover);
             border-color: var(--brand-primary);
+        }
+        
+        .alert {
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.2);
         }
     </style>
 </head>
 
 <body>
 
-    <div class="auth-wrapper">
-        <div class="auth-card">
-            <div class="auth-header">
-                <a href="index.jsp" class="logo">EventHub</a>
+    <jsp:include page="header.jsp" />
+
+    <div class="profile-container">
+        <div class="profile-card">
+            <div class="profile-header">
+                <a href="<%= request.getContextPath() %>/index.jsp" class="logo">EventHub</a>
                 <h2>My Profile</h2>
                 <p>View your account information</p>
             </div>
@@ -127,7 +205,7 @@
                     <i class="fas fa-user"></i>
                     <div class="item-content">
                         <div class="item-label">Full Name</div>
-                        <div class="item-value"><%= request.getAttribute("userName") != null ? request.getAttribute("userName") : "N/A" %></div>
+                        <div class="item-value"><%= userName != null ? userName : "N/A" %></div>
                     </div>
                 </div>
 
@@ -135,7 +213,7 @@
                     <i class="fas fa-envelope"></i>
                     <div class="item-content">
                         <div class="item-label">Email Address</div>
-                        <div class="item-value"><%= request.getAttribute("userEmail") != null ? request.getAttribute("userEmail") : "N/A" %></div>
+                        <div class="item-value"><%= userEmail != null ? userEmail : "N/A" %></div>
                     </div>
                 </div>
 
@@ -143,34 +221,16 @@
                     <i class="fas fa-id-badge"></i>
                     <div class="item-content">
                         <div class="item-label">User ID</div>
-                        <div class="item-value">#<%= request.getAttribute("userId") != null ? request.getAttribute("userId") : "N/A" %></div>
-                    </div>
-                </div>
-
-                <div class="profile-item">
-                    <i class="fas fa-calendar-alt"></i>
-                    <div class="item-content">
-                        <div class="item-label">Member Since</div>
-                        <div class="item-value">
-                            <% 
-                                Object createdAt = request.getAttribute("createdAt");
-                                if (createdAt != null) {
-                                    SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy");
-                                    out.print(sdf.format(createdAt));
-                                } else {
-                                    out.print("N/A");
-                                }
-                            %>
-                        </div>
+                        <div class="item-value">#<%= userId != null ? userId : "N/A" %></div>
                     </div>
                 </div>
             </div>
 
             <div class="profile-actions">
-                <a href="index.jsp" class="btn-profile btn-profile-secondary">
+                <a href="<%= request.getContextPath() %>/index.jsp" class="btn-profile btn-profile-secondary">
                     <i class="fas fa-home"></i> Back to Home
                 </a>
-                <a href="<%= request.getContextPath() %>/ProfileServlet?action=logout" class="btn-profile btn-profile-primary">
+                <a href="<%= request.getContextPath() %>/UserServlet?action=logout" class="btn-profile btn-profile-primary">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </a>
             </div>

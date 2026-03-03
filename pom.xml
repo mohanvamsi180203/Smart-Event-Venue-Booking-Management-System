@@ -52,7 +52,7 @@
         <version>11.0.20</version>
         <configuration>
           <httpConnector>
-            <port>8080</port>
+            <port>9090</port>
             <host>0.0.0.0</host>
           </httpConnector>
           <webApp>

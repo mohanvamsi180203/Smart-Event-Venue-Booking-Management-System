@@ -1,102 +1,107 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-    <!DOCTYPE html>
-    <html lang="en">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizer Registration | EventHub</title>
+    <link rel="stylesheet" href="css/user-style.css">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Organizer Registration | EventHub</title>
-        <link rel="stylesheet" href="css/user-style.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    </head>
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            <div class="auth-header">
+                <a href="index.jsp" class="logo">EventHub</a>
+                <h2>Organizer Registration</h2>
+                <p>Create your organizer account</p>
+            </div>
 
-    <body>
+            <div class="auth-toggle">
+                <a href="user-login.jsp">User Access</a>
+                <a href="organizer-login.jsp">Organizer Access</a>
+            </div>
 
-        <div class="auth-wrapper">
-            <div class="auth-card">
-                <div class="auth-header">
-                    <a href="index.jsp" class="logo">EventHub</a>
-                    <h2>Organizer Signup</h2>
-                    <p>Start managing your events and venues with ease</p>
+            <% 
+                String error = (String) request.getAttribute("error");
+                if (error != null) {
+            %>
+                <div class="alert alert-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <%= error %>
                 </div>
-
-                <div class="auth-toggle">
-                    <a href="user-signup.jsp">User Signup</a>
-                    <a href="organizer-signup.jsp" class="active">Organizer Signup</a>
+            <% 
+                }
+            %>
+            
+            <form action="OrganizerServlet" method="POST" class="auth-form">
+                <input type="hidden" name="action" value="register">
+                
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+                        <i class="fas fa-user"></i>
+                    </div>
                 </div>
-
-                <%-- Success/Error Messages from Servlet --%>
-                    <% if (request.getAttribute("error") !=null) { %>
-                        <div class="alert alert-error">
-                            <i class="fas fa-exclamation-circle"></i>
-                            <%= request.getAttribute("error") %>
-                        </div>
-                        <% } %>
-                            <% if (request.getAttribute("success") !=null) { %>
-                                <div class="alert alert-success">
-                                    <i class="fas fa-check-circle"></i>
-                                    <%= request.getAttribute("success") %>
-                                </div>
-                                <% } %>
-
-                                    <form action="OrganizerSignupServlet" method="POST" class="auth-form">
-                                        <div class="form-group">
-                                            <label for="org-name">Organization Name</label>
-                                            <div class="input-wrapper">
-                                                <input type="text" id="org-name" name="org-name"
-                                                    placeholder="Event Solutions Ltd" required>
-                                                <i class="fas fa-building"></i>
-                                            </div>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label for="email">Business Email</label>
-                                            <div class="input-wrapper">
-                                                <input type="email" id="email" name="email"
-                                                    placeholder="official@company.com" required>
-                                                <i class="fas fa-envelope"></i>
-                                            </div>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label for="mobile">Mobile Number</label>
-                                            <div class="input-wrapper">
-                                                <input type="tel" id="mobile" name="mobile"
-                                                    placeholder="+91 98765 43210" required>
-                                                <i class="fas fa-phone"></i>
-                                            </div>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label for="password">Password</label>
-                                            <div class="input-wrapper">
-                                                <input type="password" id="password" name="password"
-                                                    placeholder="Min. 8 characters" required minlength="8">
-                                                <i class="fas fa-lock"></i>
-                                            </div>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label for="confirm-password">Confirm Password</label>
-                                            <div class="input-wrapper">
-                                                <input type="password" id="confirm-password" name="confirm-password"
-                                                    placeholder="••••••••" required>
-                                                <i class="fas fa-shield-alt"></i>
-                                            </div>
-                                        </div>
-
-                                        <button type="submit" class="btn-auth"
-                                            style="background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);">
-                                            Register Organizer
-                                        </button>
-                                    </form>
-
-                                    <div class="auth-footer">
-                                        Already registered? <a href="organizer-login.jsp">Organizer Login</a>
-                                    </div>
+                
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="email" name="email" placeholder="name@company.com" required>
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <div class="input-wrapper">
+                        <input type="tel" id="phone" name="phone" placeholder="Enter phone number">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="companyName">Company/Organization Name</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="companyName" name="companyName" placeholder="Enter company name">
+                        <i class="fas fa-building"></i>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <div class="input-wrapper">
+                        <textarea id="address" name="address" rows="2" placeholder="Enter address"></textarea>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="password" name="password" placeholder="Minimum 6 characters" required>
+                        <i class="fas fa-lock"></i>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Re-enter password" required>
+                        <i class="fas fa-lock"></i>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-auth">Register</button>
+            </form>
+            
+            <div class="auth-footer">
+                Already registered? <a href="organizer-login.jsp">Login here</a>
             </div>
         </div>
+    </div>
 
-    </body>
-
-    </html>
+</body>
+</html>
